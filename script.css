@@ -1,0 +1,50 @@
+const apiKey = "YOUR_API_KEY"; // Replace with your OpenWeatherMap API key
+
+const cityInput = document.getElementById("cityInput");
+const searchBtn = document.getElementById("searchBtn");
+const locationBtn = document.getElementById("locationBtn");
+
+const cityName = document.getElementById("cityName");
+const temperature = document.getElementById("temperature");
+const description = document.getElementById("description");
+const humidity = document.getElementById("humidity");
+const wind = document.getElementById("wind");
+
+searchBtn.addEventListener("click", () => {
+    const city = cityInput.value;
+    if (city) {
+        fetchWeatherByCity(city);
+    }
+});
+
+locationBtn.addEventListener("click", () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            fetchWeatherByCoords(position.coords.latitude, position.coords.longitude);
+        });
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+});
+
+function fetchWeatherByCity(city) {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
+    .then(response => response.json())
+    .then(data => displayWeather(data))
+    .catch(error => alert("City not found"));
+}
+
+function fetchWeatherByCoords(lat, lon) {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`)
+    .then(response => response.json())
+    .then(data => displayWeather(data))
+    .catch(error => alert("Error fetching weather"));
+}
+
+function displayWeather(data) {
+    cityName.textContent = data.name;
+    temperature.textContent = `Temperature: ${data.main.temp}°C`;
+    description.textContent = `Condition: ${data.weather[0].description}`;
+    humidity.textContent = `Humidity: ${data.main.humidity}%`;
+    wind.textContent = `Wind Speed: ${data.wind.speed} m/s`;
+}
